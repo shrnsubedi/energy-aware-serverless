@@ -1,0 +1,21 @@
+replicas: 1
+
+leaderElection:
+  enabled: true
+
+kind: CronJob
+schedule: "*/1 * * * *"  # every 2 minutes
+
+deschedulerPolicyAPIVersion: "descheduler/v1alpha2"
+deschedulerPolicy:
+  profiles:
+    - name: test
+      pluginConfig:
+      - name: "HighNodeUtilization"
+        args:
+         thresholds:
+          cpu: 20
+      plugins:
+        deschedule:
+          enabled:
+            - "HighNodeUtilization"

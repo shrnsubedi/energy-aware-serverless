@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: s2-modeldepot
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s2-modeldepot
+  template:
+    metadata:
+      labels:
+        app: s2-modeldepot
+    spec:
+      containers:
+        - name: s2-modeldepot
+          image: shrnsubedi/s2-modeldepot:v1
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MODEL_DIR
+              value: /models
+          volumeMounts:
+            - name: model-volume
+              mountPath: /models
+      volumes:
+        - name: model-volume
+          persistentVolumeClaim:
+            claimName: s2-pvc

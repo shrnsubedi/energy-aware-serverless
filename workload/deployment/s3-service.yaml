@@ -1,0 +1,18 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: s3-sensorcruncher
+  namespace: default
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: "5"
+        autoscaling.knative.dev/target: "1"
+        autoscaling.knative.dev/minScale: "1"
+    spec:
+      schedulerName: scheduler-plugins-scheduler
+      containers:
+        - image: shrnsubedi/s3-sensorcruncher:v1
+          ports:
+            - containerPort: 8080

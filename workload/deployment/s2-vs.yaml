@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: s2-vs
+  namespace: default
+spec:
+  hosts:
+    - "*"  # Accept from all hosts
+  gateways:
+    - s2-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /upload
+        - uri:
+            prefix: /model
+      route:
+        - destination:
+            host: s2-modeldepot
+            port:
+              number: 80

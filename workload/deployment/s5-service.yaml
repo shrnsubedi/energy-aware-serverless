@@ -1,0 +1,18 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: s5-audioprocessor
+  namespace: default
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: "5"
+        autoscaling.knative.dev/target: "2"
+        autoscaling.knative.dev/minScale: "1"  # Allow scale-to-zero
+    spec:
+      schedulerName: scheduler-plugins-scheduler
+      containers:
+        - image: shrnsubedi/s5-audioprocessor:v1
+          ports:
+            - containerPort: 8080

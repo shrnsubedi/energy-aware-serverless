@@ -1,0 +1,23 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: s1-inference
+  namespace: default
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: "5"
+        autoscaling.knative.dev/target: "2"
+        autoscaling.knative.dev/minScale: "1"  # Scale to zero allowed
+    spec:
+      schedulerName: scheduler-plugins-scheduler
+      containers:
+        - image: shrnsubedi/s1-inference:v4
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MODEL_DEPOT_URL
+              value: http://s2-modeldepot.default.svc.cluster.local
+            - name: SHARED_MODEL_DIR
+              value: /mnt/data/models

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pod Placement Visualizer</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f0f0f0;
+      padding: 2rem;
+    }
+    .power {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      color: #388e3c;
+      font-weight: bold;
+    }
+    .node-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    .node {
+      background-color: #ffffff;
+      border: 2px solid #1976d2;
+      border-radius: 8px;
+      padding: 1rem;
+      width: 300px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    }
+    .node h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      color: #1976d2;
+    }
+    .node .power-metric {
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      color: #555;
+    }
+    .pod {
+      background-color: #e3f2fd;
+      padding: 0.5rem;
+      margin: 0.3rem 0;
+      border-left: 5px solid #2196f3;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1> Pod Placement Dashboard</h1>
+  <div id="power" class="power">⚡ Power: Loading...</div>
+  <div id="node-view" class="node-container">Loading...</div>
+
+  <script>
+    async function loadDashboard() {
+      const res = await fetch("/get_dashboard_data");
+      const data = await res.json();
+
+      const podMetrics = data.metrics.pod_metrics || [];
+      const nodeMetrics = data.metrics.node_metrics || [];
+      const resourceMap = data.resources || {};
+
+      // Compute total power
+      const totalPower = nodeMetrics.reduce((sum, m) => sum + m.power, 0);
+      document.getElementById("power").textContent = `⚡ Total Power: ${totalPower.toFixed(3)} W`;
+
+      // Organize pod metrics by node
+      const nodeMap = {};
+      podMetrics.forEach(pod => {
+        const node = pod.node;
+        if (!nodeMap[node]) nodeMap[node] = [];
+        nodeMap[node].push(pod);
+      });
+
+      const container = document.getElementById("node-view");
+      container.innerHTML = "";
+
+      for (const node of Object.keys(nodeMap)) {
+        const nodeData = nodeMetrics.find(n => n.node === node);
+        const nodePower = nodeData ? nodeData.power.toFixed(3) : "N/A";
+        const nodeCPU = nodeData ? nodeData.cpu_util.toFixed(3) : "N/A";
+        const nodeMemory = nodeData ? (nodeData.memory_util).toFixed(1) + "%" : "N/A";
+
+        const div = document.createElement("div");
+        div.className = "node";
+        div.innerHTML = `
+          <h2>${node}</h2>
+          <div class="power-metric">💻 Node CPU: ${nodeCPU}</div>
+          <div class="power-metric">⚡️ Node Power: ${nodePower} W</div>
+          <div class="power-metric">💾 Node Memory: ${nodeMemory}</div>
+        `;
+
+        nodeMap[node].forEach(pod => {
+          const podDiv = document.createElement("div");
+          podDiv.className = "pod";
+          podDiv.textContent = `${pod.pod} | CPU: ${pod.cpu_util.toFixed(4)} | Power: ${pod.power.toFixed(4)} W | Memory: ${pod.memory_mib.toFixed(4)} Mib`;
+          div.appendChild(podDiv);
+        });
+
+        container.appendChild(div);
+      }
+    }
+
+    loadDashboard();
+    setInterval(loadDashboard, 5000);
+  </script>
+</body>
+</html>

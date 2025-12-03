@@ -1,0 +1,13 @@
+# modeldepot-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: s2-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data/modeldepot  # Must exist on the node
+  persistentVolumeReclaimPolicy: Retain

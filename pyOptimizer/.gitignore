@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.swp
+*.swo
+*.egg-info/
+dist/
+build/
+*.log
+.venv/
+venv/
+inference_service/env/
+.env
+.envrc
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Virtualenv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# PyInstaller
+*.spec
+
+# pytest
+.cache/
+
+# MyPy
+.mypy_cache/
+
+# Go
+/bin/
+/pkg/
+/.cache/
+*.exe
+*.out
+*.test
+*.mod
+*.sum
+vendor/
+.DS_Store
+.idea/
+.vscode/
+
+env/
